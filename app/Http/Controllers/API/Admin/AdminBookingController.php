@@ -67,7 +67,7 @@ class AdminBookingController extends Controller
 
         $booking->update(['status' => 'confirmed']);
 
-        // Update linked trip
+        // Keep trip as upcoming when confirmed
         Trip::where('booking_id', $booking->id)
             ->update(['status' => 'upcoming']);
 
@@ -93,11 +93,19 @@ class AdminBookingController extends Controller
             return $this->errorResponse('booking_cannot_cancel', 422);
         }
 
+        // Update booking status to cancelled
         $booking->update(['status' => 'cancelled']);
 
-        // Update linked trip
-        Trip::where('booking_id', $booking->id)
-            ->update(['status' => 'upcoming']);
+        // ✅ Delete the linked trip completely
+        Trip::where('booking_id', $booking->id)->delete();
+
+        // ✅ Decrement user trips_count
+        if ($booking->user->trips_count > 0) {
+            $booking->user->decrement('trips_count');
+        }
+
+        // ✅ Decrement place total_bookings
+        $booking->place()->decrement('total_bookings');
 
         return $this->successResponse(
             new AdminBookingResource($booking->fresh(['user', 'place'])),

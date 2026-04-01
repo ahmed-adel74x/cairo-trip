@@ -66,7 +66,7 @@ class BookingController extends Controller
             $totalPriceAr = 'مجاني';
             $totalPriceEn = 'Free';
         } else {
-            $totalPriceAr = ($totalPriceNumber) . ' جنيه';
+            $totalPriceAr = $totalPriceNumber . ' جنيه';
             $totalPriceEn = $totalPriceNumber . ' EGP';
         }
 
@@ -128,16 +128,19 @@ class BookingController extends Controller
             return $this->errorResponse('booking_cannot_cancel', 422);
         }
 
+        // Update booking status to cancelled
         $booking->update(['status' => 'cancelled']);
 
-        // Update the linked trip status too
-        Trip::where('booking_id', $booking->id)
-            ->update(['status' => 'upcoming']);
+        // ✅ Delete the linked trip completely
+        Trip::where('booking_id', $booking->id)->delete();
 
-        // Decrement user trips_count
+        // ✅ Decrement user trips_count
         if ($request->user()->trips_count > 0) {
             $request->user()->decrement('trips_count');
         }
+
+        // ✅ Decrement place total_bookings
+        $booking->place()->decrement('total_bookings');
 
         $booking->load('place');
 
