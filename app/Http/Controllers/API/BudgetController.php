@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BudgetRequest;
 use App\Http\Resources\BudgetResultResource;
+use App\Models\Booking;
 use App\Models\Place;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -21,11 +22,18 @@ class BudgetController extends Controller
     {
         $budget      = (float) $request->budget;
         $personCount = (int) ($request->person_count ?? 1);
+        $user        = $request->user();
 
         // جلب كل الأماكن مرتبة من الأرخص للأغلى
         $allPlaces = Place::active()
             ->orderBy('price_number')
             ->get();
+
+        // ── جلب الـ booked place IDs للـ user ──────────
+        $bookedPlaceIds = Booking::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->pluck('place_id')
+            ->toArray();
 
         $selectedPlaces    = collect();
         $remainingBudget   = $budget;
@@ -38,6 +46,7 @@ class BudgetController extends Controller
             if ($costForThisPlace == 0) {
                 $place->total_cost = 0;
                 $place->can_afford = true;
+                $place->is_booked  = in_array($place->id, $bookedPlaceIds);
                 $selectedPlaces->push($place);
                 continue;
             }
@@ -46,6 +55,7 @@ class BudgetController extends Controller
             if ($costForThisPlace <= $remainingBudget) {
                 $place->total_cost  = $costForThisPlace;
                 $place->can_afford  = true;
+                $place->is_booked   = in_array($place->id, $bookedPlaceIds);
                 $remainingBudget   -= $costForThisPlace;
                 $totalCostSelected += $costForThisPlace;
                 $selectedPlaces->push($place);
@@ -56,9 +66,10 @@ class BudgetController extends Controller
         $selectedIds       = $selectedPlaces->pluck('id')->toArray();
         $notSelectedPlaces = $allPlaces->filter(function ($place) use ($selectedIds) {
             return !in_array($place->id, $selectedIds);
-        })->each(function ($place) use ($personCount) {
+        })->each(function ($place) use ($personCount, $bookedPlaceIds) {
             $place->total_cost = $place->price_number * $personCount;
             $place->can_afford = false;
+            $place->is_booked  = in_array($place->id, $bookedPlaceIds);
         })->values();
 
         return $this->successResponse(
