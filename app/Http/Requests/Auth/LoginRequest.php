@@ -25,13 +25,13 @@ class LoginRequest extends FormRequest
     }
 
     protected function failedValidation(Validator $validator): void
-    {
-        $errors = $this->formatValidationErrors(
-            $validator->errors()->toArray()
-        );
-
-        throw new HttpResponseException(
-            $this->errorResponse('validation_error', 422, $errors)
-        );
-    }
+{
+    throw new HttpResponseException(
+        $this->errorResponse(
+            'validation_error',
+            422,
+            $this->formatValidationErrors($validator)
+        )
+    );
+}
 }

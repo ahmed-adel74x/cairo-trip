@@ -96,7 +96,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'               => 'sometimes|string|min:2|max:100',
-            'phone'              => 'sometimes|nullable|string|min:10|max:20',
+            'phone'              => 'sometimes|nullable|string|min:11|max:15',
             'avatar'             => 'sometimes|image|mimes:jpeg,png,jpg,webp|max:2048',
             'preferred_language' => 'sometimes|in:ar,en',
         ]);

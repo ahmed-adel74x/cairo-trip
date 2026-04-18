@@ -23,18 +23,18 @@ class RegisterRequest extends FormRequest
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string',
-            'phone'                 => 'nullable|string|min:10|max:20',
+            'phone'                 => 'nullable|string|min:11|max:15',
         ];
     }
 
     protected function failedValidation(Validator $validator): void
-    {
-        $errors = $this->formatValidationErrors(
-            $validator->errors()->toArray()
-        );
-
-        throw new HttpResponseException(
-            $this->errorResponse('validation_error', 422, $errors)
-        );
-    }
+{
+    throw new HttpResponseException(
+        $this->errorResponse(
+            'validation_error',
+            422,
+            $this->formatValidationErrors($validator)
+        )
+    );
+}
 }

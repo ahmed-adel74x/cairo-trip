@@ -21,19 +21,19 @@ class SupportRequest extends FormRequest
         return [
             'name'    => 'nullable|string|max:100',
             'email'   => 'required|email',
-            'phone'   => 'required|string|min:10|max:20',
+            'phone'   => 'required|string|min:11|max:15',
             'problem' => 'required|string|min:10',
         ];
     }
 
     protected function failedValidation(Validator $validator): void
-    {
-        $errors = $this->formatValidationErrors(
-            $validator->errors()->toArray()
-        );
-
-        throw new HttpResponseException(
-            $this->errorResponse('validation_error', 422, $errors)
-        );
-    }
+{
+    throw new HttpResponseException(
+        $this->errorResponse(
+            'validation_error',
+            422,
+            $this->formatValidationErrors($validator)
+        )
+    );
+}
 }
