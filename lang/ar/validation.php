@@ -8,14 +8,14 @@ return [
     'unique'    => 'قيمة :attribute مستخدمة من قبل.',
     'exists'    => 'قيمة :attribute المحددة غير موجودة.',
     'min'       => [
-        'string'  => 'يجب أن لا يقل :attribute عن :min أحرف.',
-        'numeric' => 'يجب أن لا تقل قيمة :attribute عن :min.',
-        'file'    => 'يجب أن لا يقل حجم ملف :attribute عن :min كيلوبايت.',
+        'string'  => 'يجب ألا تقل :attribute عن :min أحرف.',
+        'numeric' => 'يجب ألا تقل قيمة :attribute عن :min.',
+        'file'    => 'يجب ألا يقل حجم ملف :attribute عن :min كيلوبايت.',
     ],
     'max'       => [
-        'string'  => 'يجب أن لا يزيد :attribute عن :max أحرف.',
-        'numeric' => 'يجب أن لا تزيد قيمة :attribute عن :max.',
-        'file'    => 'يجب أن لا يزيد حجم ملف :attribute عن :max كيلوبايت.',
+        'string'  => 'يجب ألا تزيد :attribute عن :max أحرف.',
+        'numeric' => 'يجب ألا تزيد قيمة :attribute عن :max.',
+        'file'    => 'يجب ألا يزيد حجم ملف :attribute عن :max كيلوبايت.',
     ],
     'between'   => [
         'numeric' => 'يجب أن تكون قيمة :attribute بين :min و :max.',
