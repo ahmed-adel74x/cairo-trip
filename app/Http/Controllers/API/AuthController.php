@@ -102,21 +102,18 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errors = $this->formatValidationErrors(
-                $validator->errors()->toArray()
-            );
-            return $this->errorResponse('validation_error', 422, $errors);
+            // نرسل الأخطاء مباشرة من الـ validator لضمان تبديل الـ :min
+            return $this->errorResponse('validation_error', 422, $validator->errors()->toArray());
         }
 
         $user = $request->user();
         $data = $request->only(['name', 'phone', 'preferred_language']);
 
-        // Handle avatar upload
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
-            $path         = $request->file('avatar')->store('avatars', 'public');
+            $path = $request->file('avatar')->store('avatars', 'public');
             $data['avatar'] = $path;
         }
 
